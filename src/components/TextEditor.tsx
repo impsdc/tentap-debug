@@ -9,18 +9,17 @@ import {
   useBridgeState,
   useEditorBridge,
 } from "@10play/tentap-editor";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import type { ViewStyle } from "react-native";
-import { Linking, Platform, Text, View } from "react-native";
-import type { WebViewMessageEvent } from "react-native-webview";
+import { Platform, Text, View } from "react-native";
 
 export const TextEditor: React.FC<any> = (props) => {
   const {
-    initialContent = "",
+    initialContent = "<p>Hello World</p>",
     placeholder,
     autofocus = false,
     avoidIosKeyboard = true,
-    editable = true,
+    editable = false,
     width = "100%",
     height,
     minHeight = 100,
@@ -87,7 +86,7 @@ export const TextEditor: React.FC<any> = (props) => {
     autofocus,
     avoidIosKeyboard,
     initialContent,
-    editable: true,
+    editable,
     dynamicHeight: isAndroidAndEditable ? true : dynamicHeight,
     webviewBaseURL: "about:blank",
     onChange: () => {
@@ -120,20 +119,6 @@ export const TextEditor: React.FC<any> = (props) => {
   useEffect(() => {
     onFocusChange?.(isFocused);
   }, [isFocused, onFocusChange]);
-
-  const handleLinkPress = useCallback((request: { url: string }) => {
-    if (request.url !== "about:blank") {
-      Linking.openURL(request.url);
-      return false;
-    } else return true;
-  }, []);
-
-  // Debug: surface Tentap webview messages/errors to help diagnose isReady not firing on iOS 1.0.1
-  const handleEditorMessage = useCallback((event: WebViewMessageEvent) => {
-    if (__DEV__) {
-      console.debug("Tentap onMessage", event?.nativeEvent?.data);
-    }
-  }, []);
 
   const containerStyle = useMemo<ViewStyle>(
     () =>
@@ -178,7 +163,7 @@ export const TextEditor: React.FC<any> = (props) => {
   return (
     <View style={containerStyle} testID={testID} {...accessibilityProps}>
       {isLoading && (
-        <View style={editorWrapperStyleMemo}>
+        <View>
           <Text>Loading...</Text>
         </View>
       )}
